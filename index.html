@@ -62,6 +62,7 @@
               <th class="p-4">ID Ajuan</th>
               <th class="p-4">Cabang</th>
               <th class="p-4">Kota</th>
+              <th class="p-4">Nama Gedung</th>
               <th class="p-4">Akhir Sewa</th>
               <th class="p-4">Deadline (EWS)</th>
               <th class="p-4">Status Progress</th>
@@ -218,11 +219,14 @@
         const tglSewaRaw = item["MASA AKHIR SEWA"] || '-';
         const ews = hitungDeadline(tglSewaRaw);
 
+       // Mengambil data nama gedung dari Google Sheets
+        const namaGedung = item["NAMA GEDUNG"] || item["Nama Gedung"] || '-';
+
         tbody.innerHTML += `
           <tr class="hover:bg-gray-50/70 transition border-b border-gray-100">
             <td class="p-4 font-mono text-xs text-gray-500">${item["ID Ajuan"] || '-'}</td>
             <td class="p-4 font-bold text-gray-900">${item.CABANG2 || '-'}</td>
-            <td class="p-4 text-gray-600">${item.Kota || '-'}</td>
+            <td class="p-4 text-gray-700 font-medium">${namaGedung}</td> <td class="p-4 text-gray-600">${item.Kota || '-'}</td>
             <td class="p-4 font-medium text-gray-700">${tglSewaRaw}</td>
             <td class="p-4 text-xs ${ews.kelas}">${ews.teks}</td>
             <td class="p-4">${statusBadge}</td>
