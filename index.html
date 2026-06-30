@@ -62,15 +62,15 @@
               <th class="p-4">ID Ajuan</th>
               <th class="p-4">Cabang</th>
               <th class="p-4">Kota</th>
-              <th class="p-4">Masa Akhir Sewa</th>
+              <th class="p-4">Akhir Sewa</th>
+              <th class="p-4">Deadline (EWS)</th>
               <th class="p-4">Status Progress</th>
-              <th class="p-4">Draft Akta</th>
               <th class="p-4 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tableBody" class="divide-y divide-gray-100 text-sm text-gray-700">
             <tr>
-              <td colspan="7" class="p-8 text-center text-gray-400">Memuat database dari Google Sheets...</td>
+              <td colspan="7" class="p-8 text-center text-gray-400">Memuat database...</td>
             </tr>
           </tbody>
         </table>
@@ -82,7 +82,7 @@
     <div class="bg-white w-full max-w-lg h-full p-6 shadow-xl overflow-y-auto transform translate-x-full transition-transform duration-300 flex flex-col justify-between" id="modalPanel">
       <div>
         <div class="flex justify-between items-center border-b pb-4 mb-4">
-          <h2 class="text-lg font-bold text-gray-800" id="modalTitle">Update Progres Cabang</h2>
+          <h2 class="text-lg font-bold text-gray-800" id="modalTitle">Update Progres</h2>
           <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-semibold cursor-pointer">&times;</button>
         </div>
 
@@ -90,7 +90,7 @@
           <input type="hidden" id="modalIdAjuan">
           
           <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tahap Progress Saat Ini</label>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tahap Progress Saat Ini</label>
             <select id="modalStatusSelect" class="w-full border p-2.5 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500" onchange="toggleFileUpload(this.value)">
               <option value="TAHAP 00 - BELUM PENGAJUAN">TAHAP 00 - BELUM PENGAJUAN</option>
               <option value="TAHAP 01 - BELUM LENGKAP">TAHAP 01 - BELUM LENGKAP</option>
@@ -105,50 +105,38 @@
             </select>
           </div>
 
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">📅 Tanggal Progres Terjadi (Wajib)</label>
+            <input type="date" id="modalTglProgres" class="w-full border p-2.5 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500">
+          </div>
+
           <div id="fileUploadGroup" class="hidden p-4 bg-blue-50 border border-blue-100 rounded-lg space-y-2">
-            <label class="block text-xs font-bold text-blue-700 uppercase tracking-wider">📁 Dokumen Draft Akta (Diwajibkan)</label>
-            <input type="file" id="modalFile" accept=".pdf,image/*" class="text-xs text-gray-600 block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white file:hover:bg-blue-700 cursor-pointer">
+            <label class="block text-xs font-bold text-blue-700 uppercase">📁 Dokumen Draft Akta</label>
+            <input type="file" id="modalFile" accept=".pdf,image/*" class="text-xs text-gray-600 block w-full cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white file:hover:bg-blue-700">
           </div>
 
           <div class="border-t pt-4">
             <h4 class="text-sm font-bold text-gray-700 mb-2">📝 Catatan Pembahasan (Opsional)</h4>
             <div class="space-y-3">
-              <div>
-                <label class="text-xs text-gray-500 block mb-0.5">Hasil diskusi dengan MM</label>
-                <textarea id="noteMM" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500" placeholder="Masukkan poin hasil diskusi..."></textarea>
-              </div>
-              <div>
-                <label class="text-xs text-gray-500 block mb-0.5">Hasil diskusi dengan Staf Ahli Gedung</label>
-                <textarea id="noteAhli" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500" placeholder="Masukkan catatan staf ahli..."></textarea>
-              </div>
-              <div>
-                <label class="text-xs text-gray-500 block mb-0.5">Usulan Negosiator</label>
-                <textarea id="noteNegosiator" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500" placeholder="Masukkan usulan tim negosiator..."></textarea>
-              </div>
-              <div>
-                <label class="text-xs text-gray-500 block mb-0.5">Usulan Negosiasi</label>
-                <textarea id="noteNegosiasi" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500" placeholder="Masukkan target nilai/opsi negosiasi..."></textarea>
-              </div>
-              <div>
-                <label class="text-xs text-gray-500 block mb-0.5">Catatan Khusus</label>
-                <textarea id="noteKhusus" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500" placeholder="Tuliskan catatan krusial lainnya..."></textarea>
-              </div>
+              <div><label class="text-xs text-gray-500 block mb-0.5">Hasil diskusi dengan MM</label><textarea id="noteMM" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500"></textarea></div>
+              <div><label class="text-xs text-gray-500 block mb-0.5">Hasil diskusi dengan Staf Ahli Gedung</label><textarea id="noteAhli" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500"></textarea></div>
+              <div><label class="text-xs text-gray-500 block mb-0.5">Usulan Negosiator</label><textarea id="noteNegosiator" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500"></textarea></div>
+              <div><label class="text-xs text-gray-500 block mb-0.5">Usulan Negosiasi</label><textarea id="noteNegosiasi" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500"></textarea></div>
+              <div><label class="text-xs text-gray-500 block mb-0.5">Catatan Khusus</label><textarea id="noteKhusus" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500"></textarea></div>
             </div>
           </div>
         </form>
       </div>
 
       <div class="border-t pt-4 mt-6 flex gap-2">
-        <button onclick="submitUpdate()" id="btnSimpan" type="button" class="w-full bg-blue-600 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-blue-700 shadow-sm transition cursor-pointer">Simpan Perubahan</button>
-        <button onclick="closeModal()" class="w-32 bg-gray-100 text-gray-600 text-sm font-medium py-2.5 rounded-lg hover:bg-gray-200 transition cursor-pointer">Batal</button>
+        <button onclick="submitUpdate()" id="btnSimpan" type="button" class="w-full bg-blue-600 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-blue-700 shadow-sm cursor-pointer transition">Simpan Perubahan</button>
+        <button onclick="closeModal()" class="w-32 bg-gray-100 text-gray-600 text-sm font-medium py-2.5 rounded-lg hover:bg-gray-200 cursor-pointer transition">Batal</button>
       </div>
     </div>
   </div>
 
   <script>
-    // ====================================================================
-    // PENTING: GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT (URL /exec KAMU)
-    // ====================================================================
+    // 🔴 MASUKKAN URL /exec APPS SCRIPT KAMU DI SINI
     const API_URL = "https://script.google.com/macros/s/AKfycbymVBXxGbUWgWR0fkvQvO3HYz26dw-DYe2Xl1MWO6DBe3KISDSeDMtukLssxxlVmBHVHQ/exec"; 
 
     let masterData = [];
@@ -156,28 +144,22 @@
 
     window.addEventListener('DOMContentLoaded', fetchDatabase);
 
-    // Memuat data dari API Google Sheets
     async function fetchDatabase() {
       const tbody = document.getElementById('tableBody');
       try {
         const res = await fetch(API_URL);
         masterData = await res.json();
-        
-        // Cek jika API mengembalikan respons error internal
         if(masterData.status === "error") {
-          tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500 font-bold">Error API: ${masterData.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500 font-bold">${masterData.message}</td></tr>`;
           return;
         }
-
         calculateStats();
         renderTable();
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500 font-bold">Gagal terhubung ke database. Pastikan Web App URL sudah terisi dan di-deploy!</td></tr>`;
-        console.error("Gagal memuat database:", err);
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500 font-bold">Gagal terhubung ke database.</td></tr>`;
       }
     }
 
-    // Hitung Dashboard Ringkasan Atas
     function calculateStats() {
       document.getElementById('statTotal').innerText = masterData.length;
       const belum = masterData.filter(d => d.TAHAP && d.TAHAP.includes("TAHAP 00")).length;
@@ -185,7 +167,29 @@
       document.getElementById('statProses').innerText = masterData.length - belum;
     }
 
-    // Render data ke dalam tabel HTML
+    // Fungsi menghitung H- minus deadline hari
+    function hitungDeadline(tglSewaStr) {
+      if (!tglSewaStr || tglSewaStr === '-') return { teks: '-', kelas: 'text-gray-400' };
+      
+      const tglSewa = new Date(tglSewaStr);
+      const hariIni = new Date();
+      
+      // Reset jam ke 00:00:00 agar hitungan murni hari
+      tglSewa.setHours(0,0,0,0);
+      hariIni.setHours(0,0,0,0);
+      
+      const selisihWaktu = tglSewa.getTime() - hariIni.getTime();
+      const selisihHari = Math.ceil(selisihWaktu / (1000 * 60 * 60 * 24));
+      
+      if (selisihHari < 0) {
+        return { teks: `⚠️ Lewat ${Math.abs(selisihHari)} Hari`, kelas: 'text-red-600 font-bold bg-red-50 px-2 py-1 rounded' };
+      } else if (selisihHari <= 90) {
+        return { teks: `🚨 H-${selisihHari} Hari`, kelas: 'text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded' };
+      } else {
+        return { teks: `H-${selisihHari} Hari`, kelas: 'text-green-600 font-medium' };
+      }
+    }
+
     function renderTable() {
       const tbody = document.getElementById('tableBody');
       const searchTxt = document.getElementById('searchBar').value.toLowerCase();
@@ -194,17 +198,13 @@
       let filtered = masterData.filter(item => {
         const matchesSearch = (item.CABANG2 && item.CABANG2.toLowerCase().includes(searchTxt)) || 
                               (item.Kota && item.Kota.toLowerCase().includes(searchTxt));
-        
-        if (currentFilter === 'TAHAP 00') {
-          return matchesSearch && item.TAHAP && item.TAHAP.includes("TAHAP 00");
-        } else if (currentFilter === 'PROSES') {
-          return matchesSearch && item.TAHAP && !item.TAHAP.includes("TAHAP 00");
-        }
+        if (currentFilter === 'TAHAP 00') return matchesSearch && item.TAHAP && item.TAHAP.includes("TAHAP 00");
+        if (currentFilter === 'PROSES') return matchesSearch && item.TAHAP && !item.TAHAP.includes("TAHAP 00");
         return matchesSearch;
       });
 
       if(filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400">Tidak ada ajuan cabang ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400">Tidak ditemukan data.</td></tr>`;
         return;
       }
 
@@ -214,33 +214,28 @@
           ? `<span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-md font-semibold">${item.TAHAP}</span>`
           : `<span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-md font-semibold">${item.TAHAP || 'Kosong'}</span>`;
 
-        // Kolom MASA AKHIR SEWA (mendukung nama kolom berbaris di file asli)
-        const masaSewa = item["MASA \nAKHIR \nSEWA"] || item["MASA AKHIR SEWA"] || '-';
-
-        const linkAkta = item["Link Draft Akta"] 
-          ? `<a href="${item["Link Draft Akta"]}" target="_blank" class="text-blue-600 hover:underline font-medium">Lihat Dokumen</a>`
-          : `<span class="text-gray-400 text-xs">-</span>`;
+        // Mengambil kolom MASA AKHIR SEWA yang sudah dinormalisasi kodenya dari \n
+        const tglSewaRaw = item["MASA AKHIR SEWA"] || '-';
+        const ews = hitungDeadline(tglSewaRaw);
 
         tbody.innerHTML += `
           <tr class="hover:bg-gray-50/70 transition border-b border-gray-100">
             <td class="p-4 font-mono text-xs text-gray-500">${item["ID Ajuan"] || '-'}</td>
             <td class="p-4 font-bold text-gray-900">${item.CABANG2 || '-'}</td>
             <td class="p-4 text-gray-600">${item.Kota || '-'}</td>
-            <td class="p-4 text-gray-600">${masaSewa}</td>
+            <td class="p-4 font-medium text-gray-700">${tglSewaRaw}</td>
+            <td class="p-4 text-xs ${ews.kelas}">${ews.teks}</td>
             <td class="p-4">${statusBadge}</td>
-            <td class="p-4">${linkAkta}</td>
             <td class="p-4 text-center">
-              <button onclick="openModal('${item["ID Ajuan"]}')" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-1.5 rounded-md shadow-xs text-xs font-medium cursor-pointer transition">Update</button>
+              <button onclick="openModal('${item["ID Ajuan"]}')" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-1.5 rounded-md text-xs font-medium cursor-pointer">Update</button>
             </td>
           </tr>
         `;
       });
     }
 
-    // Event handler kolom pencarian
     document.getElementById('searchBar').addEventListener('input', renderTable);
 
-    // Fungsi Filter Tombol Atas
     function filterData(type) {
       currentFilter = type;
       document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -251,7 +246,6 @@
       renderTable();
     }
 
-    // Fungsi sembunyi-muncul form upload file
     function toggleFileUpload(val) {
       const group = document.getElementById('fileUploadGroup');
       if (val.includes("TAHAP 08") || val.includes("TAHAP 09") || val.includes("TAHAP 10")) {
@@ -261,16 +255,18 @@
       }
     }
 
-    // Membuka Slide Panel & Memasukkan Data Lama ke Form
     function openModal(idAjuan) {
       const item = masterData.find(d => d["ID Ajuan"] == idAjuan);
       if(!item) return;
 
       document.getElementById('modalIdAjuan').value = idAjuan;
-      document.getElementById('modalTitle').innerText = `Update Status: ${item.CABANG2}`;
+      document.getElementById('modalTitle').innerText = `Update: ${item.CABANG2}`;
       document.getElementById('modalStatusSelect').value = item.TAHAP || "TAHAP 00 - BELUM PENGAJUAN";
       
-      // Muat data catatan yang sudah ada sebelumnya
+      // Set default tanggal hari ini pada input form tanggal progres
+      const hariIni = new Date().toISOString().split('T')[0];
+      document.getElementById('modalTglProgres').value = item.Tanggal_Update_Progres || hariIni;
+
       document.getElementById('noteMM').value = item.Catatan_MM || "";
       document.getElementById('noteAhli').value = item.Catatan_Staf_Ahli || "";
       document.getElementById('noteNegosiator').value = item.Usulan_Negosiator || "";
@@ -284,7 +280,6 @@
       document.body.classList.add('modal-active');
     }
 
-    // Menutup Slide Panel
     function closeModal() {
       document.getElementById('updateModal').classList.add('opacity-0', 'pointer-events-none');
       document.getElementById('modalPanel').classList.add('translate-x-full');
@@ -292,30 +287,26 @@
       document.getElementById('updateForm').reset();
     }
 
-    // Validasi & Siapkan data sebelum dikirim
     async function submitUpdate() {
       const idAjuan = document.getElementById('modalIdAjuan').value;
       const status = document.getElementById('modalStatusSelect').value;
+      const tglProgres = document.getElementById('modalTglProgres').value;
       const fileInput = document.getElementById('modalFile');
       const btn = document.getElementById('btnSimpan');
 
-      // Validasi wajib isi file jika masuk tahap pembuatan draft akta (Tahap 08, 09, 10)
-      if ((status.includes("TAHAP 08") || status.includes("TAHAP 09") || status.includes("TAHAP 10")) && fileInput.files.length === 0) {
-         // Ambil data jika sebelumnya sudah pernah upload agar tidak ter-lock wajib upload terus
-         const item = masterData.find(d => d["ID Ajuan"] == idAjuan);
-         if (!item["Link Draft Akta"]) {
-            alert("⚠️ Wajib melampirkan berkas Dokumen Draft Akta untuk tahap ini!");
-            return;
-         }
+      if (!tglProgres) {
+        alert("⚠️ Silakan isi Tanggal Progres terlebih dahulu!");
+        return;
       }
 
-      btn.innerText = "Memproses Data...";
+      btn.innerText = "Memproses...";
       btn.disabled = true;
 
       const payload = {
         action: "update_status",
         idAjuan: idAjuan,
         status: status,
+        tglProgres: tglProgres,
         catatanMM: document.getElementById('noteMM').value,
         catatanAhli: document.getElementById('noteAhli').value,
         usulanNegosiator: document.getElementById('noteNegosiator').value,
@@ -323,17 +314,8 @@
         catatanKhusus: document.getElementById('noteKhusus').value
       };
 
-      // Jika ada file terlampir, konversi ke Base64 terlebih dahulu
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        // Batasi ukuran file maksimal 5MB agar Apps Script tidak timeout
-        if (file.size > 5 * 1024 * 1024) {
-          alert("Ukuran file terlalu besar! Maksimal ukuran file adalah 5MB.");
-          btn.innerText = "Simpan Perubahan";
-          btn.disabled = false;
-          return;
-        }
-        
         const reader = new FileReader();
         reader.onload = async function() {
           payload.fileBase64 = reader.result;
@@ -347,26 +329,20 @@
       }
     }
 
-    // Kirim Data POST ke API Google Apps Script
     async function executePost(payload) {
       const btn = document.getElementById('btnSimpan');
       try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
+        const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
         const resData = await response.json();
-        
         if(resData.status === "success") {
-          alert("🎉 Data Progres Cabang Berhasil Diperbarui!");
+          alert("🎉 Data Berhasil Diperbarui!");
           closeModal();
-          fetchDatabase(); // Membaca ulang database agar tabel ter-refresh otomatis
+          fetchDatabase();
         } else {
-          alert("🚨 Gagal menyimpan data: " + resData.message);
+          alert("🚨 Gagal: " + resData.message);
         }
       } catch (err) {
-        alert("🚨 Terjadi kesalahan jaringan. Cek koneksi Anda.");
-        console.error(err);
+        alert("🚨 Terjadi kesalahan jaringan.");
       } finally {
         btn.innerText = "Simpan Perubahan";
         btn.disabled = false;
