@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EWS Kontroling Cabang 2027</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
     .modal { transition: opacity 0.25s ease; }
@@ -12,6 +13,7 @@
 </head>
 <body class="bg-gray-50 font-sans text-gray-900">
 
+  <!-- Top Navigation -->
   <nav class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center">
     <h1 class="text-xl font-bold tracking-wider">🏢 EWS DASHBOARD GEDUNG 2027</h1>
     <span class="text-sm bg-blue-800 px-3 py-1 rounded">Live Sync: Google Sheets</span>
@@ -19,6 +21,7 @@
 
   <div class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
     
+    <!-- Quick Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
         <div>
@@ -43,9 +46,10 @@
       </div>
     </div>
 
+    <!-- Filter Control & Search -->
     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-wrap gap-3 items-center justify-between">
       <div class="flex items-center gap-2 w-full md:w-auto">
-        <input type="text" id="searchBar" placeholder="Cari nama cabang atau kota..." class="w-full md:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+        <input type="text" id="searchBar" placeholder="Cari nama cabang, gedung, atau kota..." class="w-full md:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
       </div>
       <div class="flex gap-2 overflow-x-auto w-full md:w-auto">
         <button onclick="filterData('ALL')" class="filter-btn px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg shadow-sm">Semua</button>
@@ -54,6 +58,7 @@
       </div>
     </div>
 
+    <!-- Main Table Grid -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
@@ -66,12 +71,13 @@
               <th class="p-4">Akhir Sewa</th>
               <th class="p-4">Deadline (EWS)</th>
               <th class="p-4">Status Progress</th>
+              <th class="p-4">Link Berkas</th>
               <th class="p-4 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tableBody" class="divide-y divide-gray-100 text-sm text-gray-700">
             <tr>
-              <td colspan="7" class="p-8 text-center text-gray-400">Memuat database...</td>
+              <td colspan="9" class="p-8 text-center text-gray-400">Memuat database dari Google Sheets...</td>
             </tr>
           </tbody>
         </table>
@@ -79,11 +85,12 @@
     </div>
   </div>
 
+  <!-- Slide-Over Update Status Panel -->
   <div id="updateModal" class="fixed inset-0 bg-black/40 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex justify-end">
     <div class="bg-white w-full max-w-lg h-full p-6 shadow-xl overflow-y-auto transform translate-x-full transition-transform duration-300 flex flex-col justify-between" id="modalPanel">
       <div>
         <div class="flex justify-between items-center border-b pb-4 mb-4">
-          <h2 class="text-lg font-bold text-gray-800" id="modalTitle">Update Progres</h2>
+          <h2 class="text-lg font-bold text-gray-800" id="modalTitle">Update Progres Cabang</h2>
           <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-semibold cursor-pointer">&times;</button>
         </div>
 
@@ -91,8 +98,8 @@
           <input type="hidden" id="modalIdAjuan">
           
           <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tahap Progress Saat Ini</label>
-            <select id="modalStatusSelect" class="w-full border p-2.5 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500" onchange="toggleFileUpload(this.value)">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tahap Progress Saat Ini</label>
+            <select id="modalStatusSelect" class="w-full border p-2.5 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500" onchange="handleStatusChange(this.value)">
               <option value="TAHAP 00 - BELUM PENGAJUAN">TAHAP 00 - BELUM PENGAJUAN</option>
               <option value="TAHAP 01 - BELUM LENGKAP">TAHAP 01 - BELUM LENGKAP</option>
               <option value="TAHAP 02 - PENGAJUAN LENGKAP">TAHAP 02 - PENGAJUAN LENGKAP</option>
@@ -111,33 +118,54 @@
             <input type="date" id="modalTglProgres" class="w-full border p-2.5 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500">
           </div>
 
+          <!-- Dynamic File Upload Group -->
           <div id="fileUploadGroup" class="hidden p-4 bg-blue-50 border border-blue-100 rounded-lg space-y-2">
-            <label class="block text-xs font-bold text-blue-700 uppercase">📁 Dokumen Draft Akta</label>
-            <input type="file" id="modalFile" accept=".pdf,image/*" class="text-xs text-gray-600 block w-full cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white file:hover:bg-blue-700">
+            <label id="fileLabel" class="block text-xs font-bold text-blue-700 uppercase tracking-wider">📁 Dokumen Lampiran</label>
+            <input type="file" id="modalFile" class="text-xs text-gray-600 block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white file:hover:bg-blue-700 cursor-pointer">
+            <p id="fileHelpText" class="text-[11px] text-gray-500 mt-1"></p>
           </div>
 
+          <!-- Opsional Catatan Pembahasan Section -->
           <div class="border-t pt-4">
             <h4 class="text-sm font-bold text-gray-700 mb-2">📝 Catatan Pembahasan (Opsional)</h4>
             <div class="space-y-3">
-              <div><label class="text-xs text-gray-500 block mb-0.5">Hasil diskusi dengan MM</label><textarea id="noteMM" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500"></textarea></div>
-              <div><label class="text-xs text-gray-500 block mb-0.5">Hasil diskusi dengan Staf Ahli Gedung</label><textarea id="noteAhli" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500"></textarea></div>
-              <div><label class="text-xs text-gray-500 block mb-0.5">Usulan Negosiator</label><textarea id="noteNegosiator" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500"></textarea></div>
-              <div><label class="text-xs text-gray-500 block mb-0.5">Usulan Negosiasi</label><textarea id="noteNegosiasi" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500"></textarea></div>
-              <div><label class="text-xs text-gray-500 block mb-0.5">Catatan Khusus</label><textarea id="noteKhusus" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500"></textarea></div>
+              <div>
+                <label class="text-xs text-gray-500 block mb-0.5">Hasil diskusi dengan MM</label>
+                <textarea id="noteMM" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500" placeholder="Masukkan poin hasil diskusi..."></textarea>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 block mb-0.5">Hasil diskusi dengan Staf Ahli Gedung</label>
+                <textarea id="noteAhli" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500" placeholder="Masukkan catatan staf ahli..."></textarea>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 block mb-0.5">Usulan Negosiator</label>
+                <textarea id="noteNegosiator" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500" placeholder="Masukkan usulan tim negosiator..."></textarea>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 block mb-0.5">Usulan Negosiasi</label>
+                <textarea id="noteNegosiasi" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500" placeholder="Masukkan target nilai/opsi negosiasi..."></textarea>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 block mb-0.5">Catatan Khusus</label>
+                <textarea id="noteKhusus" rows="2" class="w-full border rounded-md p-2 text-xs focus:ring-1 focus:ring-blue-500" placeholder="Tuliskan catatan krusial lainnya..."></textarea>
+              </div>
             </div>
           </div>
         </form>
       </div>
 
       <div class="border-t pt-4 mt-6 flex gap-2">
-        <button onclick="submitUpdate()" id="btnSimpan" type="button" class="w-full bg-blue-600 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-blue-700 shadow-sm cursor-pointer transition">Simpan Perubahan</button>
-        <button onclick="closeModal()" class="w-32 bg-gray-100 text-gray-600 text-sm font-medium py-2.5 rounded-lg hover:bg-gray-200 cursor-pointer transition">Batal</button>
+        <button onclick="submitUpdate()" id="btnSimpan" type="button" class="w-full bg-blue-600 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-blue-700 shadow-sm transition cursor-pointer">Simpan Perubahan</button>
+        <button onclick="closeModal()" class="w-32 bg-gray-100 text-gray-600 text-sm font-medium py-2.5 rounded-lg hover:bg-gray-200 transition cursor-pointer">Batal</button>
       </div>
     </div>
   </div>
 
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // 🔴 MASUKKAN URL /exec APPS SCRIPT KAMU DI SINI
+    // ====================================================================
+    // PENTING: PASTIKAN URL WEB APP GOOGLE APPS SCRIPT SINKRON DENGAN /exec KAMU
+    // ====================================================================
     const API_URL = "https://script.google.com/macros/s/AKfycbymVBXxGbUWgWR0fkvQvO3HYz26dw-DYe2Xl1MWO6DBe3KISDSeDMtukLssxxlVmBHVHQ/exec"; 
 
     let masterData = [];
@@ -150,14 +178,16 @@
       try {
         const res = await fetch(API_URL);
         masterData = await res.json();
+        
         if(masterData.status === "error") {
-          tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500 font-bold">${masterData.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-red-500 font-bold">Error API: ${masterData.message}</td></tr>`;
           return;
         }
+
         calculateStats();
         renderTable();
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500 font-bold">Gagal terhubung ke database.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-red-500 font-bold">Gagal terhubung ke database. Pastikan Web App URL sudah terisi dan di-deploy!</td></tr>`;
       }
     }
 
@@ -168,14 +198,12 @@
       document.getElementById('statProses').innerText = masterData.length - belum;
     }
 
-    // Fungsi menghitung H- minus deadline hari
     function hitungDeadline(tglSewaStr) {
-      if (!tglSewaStr || tglSewaStr === '-') return { teks: '-', kelas: 'text-gray-400' };
+      if (!tglSewaStr || tglSewaStr === '-' || tglSewaStr === 'Kosong') return { teks: '-', kelas: 'text-gray-400' };
       
       const tglSewa = new Date(tglSewaStr);
       const hariIni = new Date();
       
-      // Reset jam ke 00:00:00 agar hitungan murni hari
       tglSewa.setHours(0,0,0,0);
       hariIni.setHours(0,0,0,0);
       
@@ -183,11 +211,11 @@
       const selisihHari = Math.ceil(selisihWaktu / (1000 * 60 * 60 * 24));
       
       if (selisihHari < 0) {
-        return { teks: `⚠️ Lewat ${Math.abs(selisihHari)} Hari`, kelas: 'text-red-600 font-bold bg-red-50 px-2 py-1 rounded' };
+        return { teks: `⚠️ Lewat ${Math.abs(selisihHari)} Hari`, kelas: 'text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-200' };
       } else if (selisihHari <= 90) {
-        return { teks: `🚨 H-${selisihHari} Hari`, kelas: 'text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded' };
+        return { teks: `🚨 H-${selisihHari} Hari`, kelas: 'text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200' };
       } else {
-        return { teks: `H-${selisihHari} Hari`, kelas: 'text-green-600 font-medium' };
+        return { teks: `H-${selisihHari} Hari`, kelas: 'text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded border border-green-100' };
       }
     }
 
@@ -198,14 +226,20 @@
 
       let filtered = masterData.filter(item => {
         const matchesSearch = (item.CABANG2 && item.CABANG2.toLowerCase().includes(searchTxt)) || 
+                              (item["NAMA GEDUNG"] && item["NAMA GEDUNG"].toLowerCase().includes(searchTxt)) ||
+                              (item["Nama Gedung"] && item["Nama Gedung"].toLowerCase().includes(searchTxt)) ||
                               (item.Kota && item.Kota.toLowerCase().includes(searchTxt));
-        if (currentFilter === 'TAHAP 00') return matchesSearch && item.TAHAP && item.TAHAP.includes("TAHAP 00");
-        if (currentFilter === 'PROSES') return matchesSearch && item.TAHAP && !item.TAHAP.includes("TAHAP 00");
+        
+        if (currentFilter === 'TAHAP 00') {
+          return matchesSearch && item.TAHAP && item.TAHAP.includes("TAHAP 00");
+        } else if (currentFilter === 'PROSES') {
+          return matchesSearch && item.TAHAP && !item.TAHAP.includes("TAHAP 00");
+        }
         return matchesSearch;
       });
 
       if(filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400">Tidak ditemukan data.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-gray-400">Tidak ada ajuan cabang ditemukan.</td></tr>`;
         return;
       }
 
@@ -215,23 +249,26 @@
           ? `<span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-md font-semibold">${item.TAHAP}</span>`
           : `<span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-md font-semibold">${item.TAHAP || 'Kosong'}</span>`;
 
-        // Mengambil kolom MASA AKHIR SEWA yang sudah dinormalisasi kodenya dari \n
-        const tglSewaRaw = item["MASA AKHIR SEWA"] || '-';
+        const tglSewaRaw = item["MASA AKHIR SEWA"] || item["Akhir Sewa"] || item["Masa Akhir Sewa"] || '-';
         const ews = hitungDeadline(tglSewaRaw);
-
-       // Mengambil data nama gedung dari Google Sheets
         const namaGedung = item["NAMA GEDUNG"] || item["Nama Gedung"] || '-';
+
+        const linkAkta = item["Link Draft Akta"] 
+          ? `<a href="${item["Link Draft Akta"]}" target="_blank" class="text-blue-600 hover:underline font-medium">Lihat Berkas</a>`
+          : `<span class="text-gray-400 text-xs">-</span>`;
 
         tbody.innerHTML += `
           <tr class="hover:bg-gray-50/70 transition border-b border-gray-100">
             <td class="p-4 font-mono text-xs text-gray-500">${item["ID Ajuan"] || '-'}</td>
             <td class="p-4 font-bold text-gray-900">${item.CABANG2 || '-'}</td>
-            <td class="p-4 text-gray-700 font-medium">${namaGedung}</td> <td class="p-4 text-gray-600">${item.Kota || '-'}</td>
+            <td class="p-4 text-gray-700 font-medium">${namaGedung}</td>
+            <td class="p-4 text-gray-600">${item.Kota || '-'}</td>
             <td class="p-4 font-medium text-gray-700">${tglSewaRaw}</td>
-            <td class="p-4 text-xs ${ews.kelas}">${ews.teks}</td>
+            <td class="p-4 text-xs">${ews.teks !== '-' ? `<span class="${ews.kelas}">${ews.teks}</span>` : '-'}</td>
             <td class="p-4">${statusBadge}</td>
+            <td class="p-4">${linkAkta}</td>
             <td class="p-4 text-center">
-              <button onclick="openModal('${item["ID Ajuan"]}')" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-1.5 rounded-md text-xs font-medium cursor-pointer">Update</button>
+              <button onclick="openModal('${item["ID Ajuan"]}')" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-1.5 rounded-md shadow-xs text-xs font-medium cursor-pointer transition">Update</button>
             </td>
           </tr>
         `;
@@ -250,25 +287,42 @@
       renderTable();
     }
 
-    function toggleFileUpload(val) {
+    // 🟢 FUNGSI BARU: Mengatur Hak Akses Upload Berdasarkan Pilihan Tahap Progress
+    function handleStatusChange(val) {
       const group = document.getElementById('fileUploadGroup');
-      if (val.includes("TAHAP 08") || val.includes("TAHAP 09") || val.includes("TAHAP 10")) {
+      const fileInput = document.getElementById('modalFile');
+      const label = document.getElementById('fileLabel');
+      const helpText = document.getElementById('fileHelpText');
+
+      if (val.includes("TAHAP 01") || val.includes("TAHAP 02")) {
+        // TAHAP AWAL: BISA UPLOAD SEMUA EKSTENSI BERKAS
         group.classList.remove('hidden');
+        fileInput.removeAttribute('accept'); // Hapus batasan ekstensi
+        label.innerText = "📁 Berkas Lampiran Umum (KTP, NPWP, Berkas Pendukung)";
+        helpText.innerText = "Menerima semua jenis file (PDF, Images, Word, Excel, ZIP, dll) Maks. 5MB.";
+      } else if (val.includes("TAHAP 08") || val.includes("TAHAP 09") || val.includes("TAHAP 10")) {
+        // TAHAP DRAFT: DIKUNCI KHUSUS PDF & GAMBAR SAJA
+        group.classList.remove('hidden');
+        fileInput.setAttribute('accept', '.pdf,image/*'); // Kunci ekstensi
+        label.innerText = "📁 Dokumen Resmi Draft Akta / Sewa";
+        helpText.innerText = "Hanya menerima ekstensi .pdf atau file gambar (JPG/PNG). Maks. 5MB.";
       } else {
+        // TAHAP LAINNYA: SEMBUNYIKAN INPUT FILE
         group.classList.add('hidden');
+        fileInput.value = "";
       }
     }
 
     function openModal(idAjuan) {
       const item = masterData.find(d => d["ID Ajuan"] == idAjuan);
       if(!item) return;
+
       const gedung = item["NAMA GEDUNG"] || item["Nama Gedung"] || '';
 
       document.getElementById('modalIdAjuan').value = idAjuan;
       document.getElementById('modalTitle').innerText = `Update: ${item.CABANG2} (${gedung})`;
       document.getElementById('modalStatusSelect').value = item.TAHAP || "TAHAP 00 - BELUM PENGAJUAN";
       
-      // Set default tanggal hari ini pada input form tanggal progres
       const hariIni = new Date().toISOString().split('T')[0];
       document.getElementById('modalTglProgres').value = item.Tanggal_Update_Progres || hariIni;
 
@@ -278,7 +332,7 @@
       document.getElementById('noteNegosiasi').value = item.Usulan_Negosiasi || "";
       document.getElementById('noteKhusus').value = item.Catatan_Khusus || "";
 
-      toggleFileUpload(document.getElementById('modalStatusSelect').value);
+      handleStatusChange(document.getElementById('modalStatusSelect').value);
 
       document.getElementById('updateModal').classList.remove('opacity-0', 'pointer-events-none');
       document.getElementById('modalPanel').classList.remove('translate-x-full');
@@ -304,7 +358,16 @@
         return;
       }
 
-      btn.innerText = "Memproses...";
+      // Validasi wajib berkas hanya untuk tahap krusial Draft Akta (Tahap 08 ke atas) jika di Drive belum ada linknya
+      if ((status.includes("TAHAP 08") || status.includes("TAHAP 09") || status.includes("TAHAP 10")) && fileInput.files.length === 0) {
+         const item = masterData.find(d => d["ID Ajuan"] == idAjuan);
+         if (!item["Link Draft Akta"]) {
+            alert("⚠️ Wajib melampirkan berkas Dokumen Draft Akta untuk tahap ini!");
+            return;
+         }
+      }
+
+      btn.innerText = "Memproses Data...";
       btn.disabled = true;
 
       const payload = {
@@ -321,6 +384,13 @@
 
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+          alert("Ukuran file terlalu besar! Maksimal ukuran file adalah 5MB.");
+          btn.innerText = "Simpan Perubahan";
+          btn.disabled = false;
+          return;
+        }
+        
         const reader = new FileReader();
         reader.onload = async function() {
           payload.fileBase64 = reader.result;
@@ -337,17 +407,21 @@
     async function executePost(payload) {
       const btn = document.getElementById('btnSimpan');
       try {
-        const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
         const resData = await response.json();
+        
         if(resData.status === "success") {
-          alert("🎉 Data Berhasil Diperbarui!");
+          alert("🎉 Data Progres Cabang Berhasil Diperbarui!");
           closeModal();
           fetchDatabase();
         } else {
-          alert("🚨 Gagal: " + resData.message);
+          alert("🚨 Gagal menyimpan data: " + resData.message);
         }
       } catch (err) {
-        alert("🚨 Terjadi kesalahan jaringan.");
+        alert("🚨 Terjadi kesalahan jaringan. Cek koneksi Anda.");
       } finally {
         btn.innerText = "Simpan Perubahan";
         btn.disabled = false;
