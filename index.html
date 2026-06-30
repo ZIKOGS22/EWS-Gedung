@@ -164,7 +164,7 @@
   <!-- JAVASCRIPT LOGIC -->
   <script>
     // ====================================================================
-    // PENTING: PASTIKAN URL WEB APP GOOGLE APPS SCRIPT SINKRON DENGAN /exec KAMU
+    // PENTING: GANTI URL DI BAWAH INI DENGAN LINK WEB APP /EXEC KAMU YANG ASLI
     // ====================================================================
     const API_URL = "https://script.google.com/macros/s/AKfycbymVBXxGbUWgWR0fkvQvO3HYz26dw-DYe2Xl1MWO6DBe3KISDSeDMtukLssxxlVmBHVHQ/exec"; 
 
@@ -287,7 +287,7 @@
       renderTable();
     }
 
-    // 🟢 FUNGSI BARU: Mengatur Hak Akses Upload Berdasarkan Pilihan Tahap Progress
+    // MENGATUR HAK AKSES UPLOAD BERDASARKAN PILIHAN TAHAP PROGRESS
     function handleStatusChange(val) {
       const group = document.getElementById('fileUploadGroup');
       const fileInput = document.getElementById('modalFile');
@@ -295,19 +295,16 @@
       const helpText = document.getElementById('fileHelpText');
 
       if (val.includes("TAHAP 01") || val.includes("TAHAP 02")) {
-        // TAHAP AWAL: BISA UPLOAD SEMUA EKSTENSI BERKAS
         group.classList.remove('hidden');
-        fileInput.removeAttribute('accept'); // Hapus batasan ekstensi
+        fileInput.removeAttribute('accept'); 
         label.innerText = "📁 Berkas Lampiran Umum (KTP, NPWP, Berkas Pendukung)";
-        helpText.innerText = "Menerima semua jenis file (PDF, Images, Word, Excel, ZIP, dll) Maks. 5MB.";
+        helpText.innerText = "Menerima semua jenis file (PDF, Images, Word, Excel, ZIP, dll) Maks. 35MB.";
       } else if (val.includes("TAHAP 08") || val.includes("TAHAP 09") || val.includes("TAHAP 10")) {
-        // TAHAP DRAFT: DIKUNCI KHUSUS PDF & GAMBAR SAJA
         group.classList.remove('hidden');
-        fileInput.setAttribute('accept', '.pdf,image/*'); // Kunci ekstensi
+        fileInput.setAttribute('accept', '.pdf,image/*'); 
         label.innerText = "📁 Dokumen Resmi Draft Akta / Sewa";
         helpText.innerText = "Hanya menerima ekstensi .pdf atau file gambar (JPG/PNG). Maks. 5MB.";
       } else {
-        // TAHAP LAINNYA: SEMBUNYIKAN INPUT FILE
         group.classList.add('hidden');
         fileInput.value = "";
       }
@@ -358,7 +355,6 @@
         return;
       }
 
-      // Validasi wajib berkas hanya untuk tahap krusial Draft Akta (Tahap 08 ke atas) jika di Drive belum ada linknya
       if ((status.includes("TAHAP 08") || status.includes("TAHAP 09") || status.includes("TAHAP 10")) && fileInput.files.length === 0) {
          const item = masterData.find(d => d["ID Ajuan"] == idAjuan);
          if (!item["Link Draft Akta"]) {
@@ -384,8 +380,17 @@
 
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        if (file.size > 5 * 1024 * 1024) {
-          alert("Ukuran file terlalu besar! Maksimal ukuran file adalah 5MB.");
+        
+        // 🟢 VALIDASI UKURAN FILE DINAMIS 35MB (DI UPDATE DISINI)
+        let maxUkuranMBytes = 5; 
+        if (status.includes("TAHAP 01") || status.includes("TAHAP 02")) {
+          maxUkuranMBytes = 35; 
+        }
+
+        const maxSizeBytes = maxUkuranMBytes * 1024 * 1024;
+        
+        if (file.size > maxSizeBytes) {
+          alert(`🚨 Ukuran file terlalu besar! Untuk tahap ini maksimal ukuran file adalah ${maxUkuranMBytes}MB.`);
           btn.innerText = "Simpan Perubahan";
           btn.disabled = false;
           return;
