@@ -61,8 +61,8 @@
             <tr class="bg-gray-50 border-b border-gray-100 text-gray-600 text-sm font-semibold">
               <th class="p-4">ID Ajuan</th>
               <th class="p-4">Cabang</th>
-              <th class="p-4">Kota</th>
               <th class="p-4">Nama Gedung</th>
+              <th class="p-4">Kota</th>
               <th class="p-4">Akhir Sewa</th>
               <th class="p-4">Deadline (EWS)</th>
               <th class="p-4">Status Progress</th>
@@ -262,9 +262,10 @@
     function openModal(idAjuan) {
       const item = masterData.find(d => d["ID Ajuan"] == idAjuan);
       if(!item) return;
+      const gedung = item["NAMA GEDUNG"] || item["Nama Gedung"] || '';
 
       document.getElementById('modalIdAjuan').value = idAjuan;
-      document.getElementById('modalTitle').innerText = `Update: ${item.CABANG2}`;
+      document.getElementById('modalTitle').innerText = `Update: ${item.CABANG2} (${gedung})`;
       document.getElementById('modalStatusSelect').value = item.TAHAP || "TAHAP 00 - BELUM PENGAJUAN";
       
       // Set default tanggal hari ini pada input form tanggal progres
